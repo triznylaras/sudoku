@@ -18,6 +18,12 @@ module Sudoku
           expect(row.size).to eq(9)
         end
       end
+
+      it 'create 9x9 board with default value of 0' do
+        board.grid.each_with_index do |row, index|
+          expect(row[index].value).to eq(0)
+        end
+      end
     end
 
     context '#grid' do

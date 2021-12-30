@@ -17,5 +17,11 @@ module Sudoku
     def set_cell(x_ax, y_ax, value)
       grid[y_ax][x_ax].value = value
     end
+
+    def formatted_grid
+      grid.each do |row|
+        puts row.map(&:value).join(' ')
+      end
+    end
   end
 end
