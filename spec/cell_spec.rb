@@ -8,9 +8,9 @@ module Sudoku
         expect(cell.value).to eq ''
       end
 
-      it "can be initialized with a value of '0'" do
-        cell = Cell.new(0)
-        expect(cell.value).to eq 0
+      it 'can be initialized with a value of integer' do
+        cell = Cell.new(5)
+        expect(cell.value).to eq 5
       end
     end
   end

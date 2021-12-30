@@ -9,3 +9,4 @@ end
 
 require_relative './sudoku/cell'
 require_relative './sudoku/board'
+require_relative './sudoku/sudoku_gen'
