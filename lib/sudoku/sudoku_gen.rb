@@ -2,6 +2,8 @@ require 'pry-byebug'
 
 module Sudoku
   class SudokuGen
+    attr_reader :grid
+    
     grid = []
 
     def initialize(grid_string = "")
