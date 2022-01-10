@@ -5,11 +5,16 @@ module Sudoku
   class SudokuGen
     include Display
 
-    attr_reader :grid
+    attr_reader :grid, :hints
 
-    def initialize(grid_string = "")
+    def initialize(grid_string = '')
       puts display_rules
+      puts display_new_game
 
+      new_puzzle(grid_string)
+    end
+
+    def new_puzzle(grid_string)
       # Either take a pre-created puzzle, or create a new one programmatically
       if grid_string != ''
         @grid = grid_string.split('').map(&:to_i)
@@ -18,32 +23,31 @@ module Sudoku
       else
         generate until valid?
 
-        until (obviouses.length <= 5) && (hints <= 40)
-          # Assign a random cell to 0, as well as its opposite (to keep the puzzle symmetrical)
-
-          copy = dup
-
-          known = (0...81).to_a - unknowns
-          cell = known.sample
-
-          copy.getgrid[cell] = 0
-          copy.getgrid[opposite_of(cell)] = 0
-
-          # Only implement the changes if the puzzle is still solvable
-
-          @grid = copy.getgrid if copy.solvable?
-        end
+        new_generate
       end
-      # binding.pry
+    end
+
+    def new_generate
+      until (obviouses.length <= 5) && (hints <= 40)
+        # Assign a random cell to 0, as well as its opposite (to keep the puzzle symmetrical)
+        copy = dup
+
+        known = (0...81).to_a - unknowns
+        cell = known.sample
+
+        copy.getgrid[cell] = 0
+        copy.getgrid[opposite_of(cell)] = 0
+
+        # Only implement the changes if the puzzle is still solvable
+        @grid = copy.getgrid if copy.solvable?
+      end
     end
 
     def solvable?
       # First make sure there are >= 17 clues (minimum possible for a sudoku)
-
       return false if hints < 17
 
       # Check if the puzzle is able to be solved, and that only one solution is possible
-
       copy = dup
       copy.solve!
 
@@ -63,7 +67,6 @@ module Sudoku
       until unchanged
         # Loop through grid looking for cells with only one option, then fill that option in.
         # Repeat loop over entire grid until no cells with only one possible answer remain
-
         unchanged = true
 
         unknowns.each do |i|
@@ -85,8 +88,18 @@ module Sudoku
       # If solution remains unsolved, then go through the cell with the smallest number of options
       # For each of those options, attempt to solve the puzzle with that option filled in
 
-      solutions = []
+      @solutions = []
 
+      recheck_solution(pmin, imin)
+
+      # Check if every option yielded the same potential solution
+      return unless !@solutions.empty? && @solutions.uniq.length == 1
+
+      # If so, set self's grid to that solution
+      @grid = @solutions[0]
+    end
+
+    def recheck_solution(pmin, imin)
       pmin.each do |guess|
         new_copy = dup
         new_copy[row_of(imin), col_of(imin)] = guess
@@ -96,19 +109,13 @@ module Sudoku
         next unless new_copy.solved?
 
         # Cache every potential solutions
-        solutions.push(new_copy.getgrid)
+        @solutions.push(new_copy.getgrid)
 
-        if solutions.uniq.length > 1
+        if @solutions.uniq.length > 1
           # Check if there are differing solutions so far
           return false
         end
       end
-
-      # Check if every option yielded the same potential solution
-      return unless !solutions.empty? && solutions.uniq.length == 1
-
-      # If so, set self's grid to that solution
-      @grid = solutions[0]
     end
 
     def dup

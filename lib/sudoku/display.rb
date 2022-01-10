@@ -13,10 +13,15 @@ module Display
 
       Once the puzzle is solved, this means that every row, column, and 3×3 box will contain every number from 1 to 9 exactly once. 
 
-      In other words, no number can be repeated in any 3×3 box, row, or column. 
+      In other words, no number can be repeated in any 3×3 box, row, or column.
 
     HEREDOC
   end
 
+  def display_new_game
+    <<~HEREDOC
+      The following is a sudoku board that you will solve :
 
+    HEREDOC
+  end
 end
